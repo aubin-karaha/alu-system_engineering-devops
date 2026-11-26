@@ -1,19 +1,21 @@
 #!/usr/bin/env bash
-# Configures Nginx to permanently redirect /redirect_me.
+# Configures Nginx to redirect /redirect_me to YouTube.
 
-apt-get update -y
-apt-get install -y nginx
+sudo apt-get update
+sudo apt-get install -y nginx
 
-cat > /etc/nginx/sites-available/default <<'EOF'
+sudo tee /etc/nginx/sites-available/default > /dev/null <<'EOF'
 server {
     listen 80 default_server;
+    listen [::]:80 default_server;
+
     server_name _;
 
     root /var/www/html;
     index index.html;
 
     location /redirect_me {
-        return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
+        return 301 https://www.youtube.com/watch?v=QH2-TGULwu4;
     }
 
     location / {
@@ -22,6 +24,7 @@ server {
 }
 EOF
 
-ln -sfn /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+sudo ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
-nginx -t && service nginx restart
+sudo nginx -t
+sudo service nginx restart
