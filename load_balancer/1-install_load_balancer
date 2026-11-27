@@ -33,4 +33,6 @@ haproxy -c -f /etc/haproxy/haproxy.cfg
 
 service haproxy restart
 
+cat /etc/haproxy/haproxy.cfg
+
 echo "Configured web-01 and web-02 with roundrobin load balancing."
