@@ -3,10 +3,17 @@
 
 function doing ()
 {
-	echo $(dig "www.$1" | grep -A1 'ANSWER SECTION:' | awk 'NR == 2 {print "The subdomain " $1 " is a " $4 " record and points to " $5}')
-	echo $(dig "lb-01.$1" | grep -A1 'ANSWER SECTION:' | awk 'NR == 2 {print "The subdomain " $1 " is a " $4 " record and points to " $5}')
-	echo $(dig "web-01.$1" | grep -A1 'ANSWER SECTION:' | awk 'NR == 2 {print "The subdomain " $1 " is a " $4 " record and points to " $5}')
-	echo $(dig "web-02.$1" | grep -A1 'ANSWER SECTION:' | awk 'NR == 2 {print "The subdomain " $1 " is a " $4 " record and points to " $5}')
+    result=$(dig "$1.$2" +noall +answer | awk -v subdomain="$1" '{
+        print "The subdomain " subdomain " is a " $4 " record and points to " $5
+    }')
+    echo "$result"
 }
 
-doing $1;
+if [ -n "$2" ]; then
+    doing "$2" "$1"
+else
+    doing "www" "$1"
+    doing "lb-01" "$1"
+    doing "web-01" "$1"
+    doing "web-02" "$1"
+fi
