@@ -4,17 +4,33 @@
 apt-get update
 apt-get install -y haproxy
 
-cat > /etc/haproxy/haproxy.cfg <<'EOF'
+sed -i 's/^ENABLED=.*/ENABLED=1/' /etc/default/haproxy
+
+cat > /etc/haproxy/haproxy.cfg <<'CONFIG'
+global
+    daemon
+    maxconn 256
+
+defaults
+    mode http
+    option httplog
+    option dontlognull
+    timeout connect 5000
+    timeout client 50000
+    timeout server 50000
+
 frontend http_front
     bind *:80
-    mode http
     default_backend http_back
 
 backend http_back
-    mode http
     balance roundrobin
-    server 7317-web-01 35.176.235.173:80 check
-    server 7317-web-02 WEB02_IP:80 check
-EOF
+    server web-01 35.176.235.173:80 check
+    server web-02 7317-web-02:80 check
+CONFIG
+
+haproxy -c -f /etc/haproxy/haproxy.cfg
 
 service haproxy restart
+
+echo "Configured web-01 and web-02 with roundrobin load balancing."
